@@ -41,6 +41,7 @@ Repository for the 2026 Data &amp; Innovation for refugees and Inclusion hackath
 - in base alla comparazione tra scorecard e cashy la UI/UX potrebbe variare con messaggi di warning/pop-ups per portare attensione all'uso di IA e possibili bias
 - attivazione della precedente feature aleatoria
 - possibile roll-back da survey (per furbetti) 
+- in base a casi noti dove Cashy è noto di lavorare meglio/peggio, la threshold per messaggi di warning/pop-up viene alzata/abbassata di conseguenza
 
 ### Operator survey architecture
 
