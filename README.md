@@ -140,19 +140,19 @@ The system should report trends rather than turn individual operators into perfo
 
 The solution follows five principles from the challenge:
 
-1. Human judgement must remain meaningful:
+1. **Human judgement must remain meaningful**:
 the operator is not an approval button, he's the final decision-maker.
 
-2. Reasoning and recommendation stay separate:
+2. **Reasoning and recommendation stay separate**:
 Cashy's explanation and its recommendation are evaluated independently.
 
-3. Reliance must be measured behaviourally:
+3. **Reliance must be measured behaviourally**:
 we measure correct override, over-reliance, correct acceptance and under-reliance rather than simply measuring agreement with AI.
 
-4. Oversight must be visible at the institutional level:
+4. **Oversight must be visible at the institutional level**:
 a loss of appropriate reliance should become observable before it becomes a systemic problem.
 
-5. Monitoring must not become another source of pressure:
+5. **Monitoring must not become another source of pressure**:
 the goal is not to maximize overrides, it's to maintain appropriate reliance on AI.
 
 ## Data and ethics
