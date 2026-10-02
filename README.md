@@ -18,10 +18,10 @@ This creates a specific risk: **over-reliance on AI**.
 
 The goal is therefore not simply to maximize agreement with the AI, but to support appropriate reliance:
 
-- Correct override: Cashy is wrong and the caseworker overrides it.
-- Over-reliance: Cashy is wrong and the caseworker accepts it.
-- Correct acceptance: Cashy is correct and the caseworker accepts it.
-- Under-reliance: Cashy is correct and the caseworker overrides it.
+- Correct override: Cashy is wrong and the caseworker overrides it
+- Over-reliance: Cashy is wrong and the caseworker accepts it
+- Correct acceptance: Cashy is correct and the caseworker accepts it
+- Under-reliance: Cashy is correct and the caseworker overrides it
 
 Importantly, throughout this project, "correct" means agreement with the operation's recorded determination. This is the institutional reference standard for the exercise, not ground truth about a household's needs.
 
@@ -43,27 +43,27 @@ The system also monitors aggregated behaviour over time so that a loss of human 
 ## Workflow pipeline
 
 ```txt
-    START                                               
-      │                                                 
-┌─────▼─────┐                  ┌───────┐                
-│ Interview ├──Data+opinion────► Cashy ├──┐             
-└─────┬─────┘                  └───────┘  │             
-      │                                 Score+motivation
-      │                                   │             
-      │                              ┌────▼──────┐      
-      └───────────Scorecard──────────► Judgement │      
-                                     │  Process  │      
-                                     └────┬──────┘      
-                                          │             
-                                     ┌────▼─────┐       
-                                     │ Operator │       
-                                     │  Survey  │       
-                                     └────┬─────┘       
-                                          │             
-                                         END                  
+      START                                                       
+        │                                                         
+  ┌─────▼─────┐                  ┌───────┐                        
+  │ Interview ├──Data+opinion────► Cashy ├──┐                     
+  └─────┬─────┘                  └───────┘  │                     
+        │                                 Score+motivation        
+        │                                   │                     
+        │                              ┌────▼──────┐              
+        └───────────Scorecard──────────► Judgement │              
+                                       │  Process  │              
+                                       └────┬───▲──┘              
+                                            │   │                 
+                                       ┌────▼───┴─┐               
+                                       │ Operator │               
+                                       │  Survey  │               
+                                       └────┬─────┘               
+                                            │                     
+                                           END                    
 ```
 
-## Judgement process architecture
+## Decision process architecture
 
 The judgement process is designed around a key principle from the challenge brief: Cashy's reasoning and its final answer must be treated as separate outputs.
 A single "I agree" interaction is not sufficient evidence that the operator actually evaluated the recommendation.
@@ -154,6 +154,45 @@ A loss of appropriate reliance should become observable before it becomes a syst
 
 5. Monitoring must not become another source of pressure
 The goal is not to maximize overrides. The goal is to maintain appropriate reliance on AI.
+
+## Data and ethics
+
+This project uses synthetic data only.
+
+The challenge provides a synthetic sample derived from historical Scorecard records. It does not represent real households.
+We therefore:
+
+- do not use real household data
+- do not attempt to identify caseworkers
+- do not reconstruct withheld free-text information
+- do not treat the synthetic sample as representative of the real operational population
+- do not use override behaviour as an individual performance score
+- keep the human responsible for the final decision
+- and distinguish the institutional reference determination from "truth" about a household
+
+### Important limitation
+
+The synthetic dataset should not be used to benchmark Cashy's real-world eligibility performance. The challenge documentation explicitly warns that eligibility in the synthetic sample is almost unrelated to the final score and that results from it should be presented as properties of the synthetic sample.
+
+## Feasibility of implementation
+
+The solution does not require replacing/retraining Cashy or introducing a new AI system. Instead, it adds an instrumentation and monitoring layer around the existing decision process.
+
+### Deployment and maintainability
+
+A staged implementation would reduce deployment risk:
+
+1. Prototype: validate the interaction design using synthetic cases
+2. Override audit: test the workflow on already-decided cases before it is used in consequential decisions
+3. Pilot: deploy the instrumentation to a limited operational setting with appropriate governance and monitoring
+4. Production monitoring: integrate the structured event data with the existing reporting pipeline
+5. Continuous evaluation: periodically audit whether interventions change behaviour and whether monitoring signals remain informative
+
+### Cost and scalability
+
+The approach is designed to minimize infrastructure and maintenance costs because it reuses existing components rather than requiring a new model-serving or analytics platform. The principal implementation cost is therefore in interface integration, structured event logging, dashboard configuration and evaluation. The output formatted as a JSON is easily importable into Power BI for 
+
+The same architecture can also be reused across different targeting workflows. The intervention rules, survey questions and metrics can be configured independently of the underlying prediction model, allowing the oversight layer to remain useful even if Cashy's model is changed or replaced.
 
 ## Prototype
 
