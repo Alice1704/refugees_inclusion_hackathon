@@ -224,3 +224,7 @@ Additional tools and resources:
 ## References
 
 - [UNHCR Innovation — Cashy Oversight Challenge and hackathon materials.](https://maldonam.github.io/public/)
+- O'Brien, H.L. and Toms, E.G. (2008). What is user engagement? A conceptual framework for defining user engagement with technology. J. Am. Soc. Inf. Sci., 59: 938-955. [https://doi.org/10.1002/asi.20801](https://doi.org/10.1002/asi.20801)
+- Dietvorst, Simmons & Massey (2015). Algorithm aversion: People Erroneously Avoid Algorithms after Seeing Them Err
+- Yu, L., Li, Y., & Fan, F. (2023). Employees' Appraisals and Trust of Artificial Intelligences' Transparency and Opacity. _Behavioral sciences (Basel, Switzerland)_, _13_(4), 344. https://doi.org/10.3390/bs13040344
+- Logg, J. M., Minson, J. A., & Moore, D. A. (2019). Algorithm appreciation: People prefer algorithmic to human judgment. _Organizational Behavior and Human Decision Processes_, _151_, 90–103. [https://doi.org/10.1016/j.obhdp.2018.12.005](https://doi.org/10.1016/j.obhdp.2018.12.005)
