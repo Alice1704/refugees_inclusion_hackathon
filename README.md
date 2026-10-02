@@ -205,10 +205,10 @@ The prototype demonstrates three representative cases:
 For each case, the demo shows:
 
 - Cashy's reasoning
-- Cashy's score and recommendation
+- Cashy's recommendation
 - warning and cognitive-forcing mechanisms
 - attention-detection behaviour
-- the operator judgement
+- the comparison judgement
 - the mandatory survey
 
 ## Acknowledgements
