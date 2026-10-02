@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UNHCR Case Context (external variables behind a Cashy recommendation)",
+  "type": "object",
+  "required": [
+    "record_id",
+    "month",
+    "office",
+    "description",
+    "external_variables"
+  ],
+  "properties": {
+
+    "record_id": {
+      "type": "integer"
+    },
+
+    "month": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}$"
+    },
+
+    "office": {
+      "type": ["string", "null"]
+    },
+
+    "description": {
+      "type": "string"
+    },
+
+    "external_variables": {
+      "type": "object",
+      "properties": {
+
+        "budget_places_available": {
+          "type": "integer"
+        },
+
+        "budget_places_assigned": {
+          "type": "integer"
+        },
+
+        "origin_country_conflict": {
+          "type": "boolean"
+        },
+
+        "security_exposure": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+
+        "displacement_stage": {
+          "type": "string",
+          "enum": ["recent", "settled", "long_term"]
+        },
+
+        "sex_or_sexuality_discrimination": {
+          "type": "boolean"
+        },
+
+        "activism_exposure": {
+          "type": "boolean"
+        },
+
+        "interpretation_available": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
