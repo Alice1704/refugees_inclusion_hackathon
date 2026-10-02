@@ -38,8 +38,7 @@
   },
   "decision": {
     "eligibility_target": "EXCLUSION",
-    "eligibility_status": "No Elegible",
-    "rule": "Every scorecard component is at its minimum and the vulnerability index stays below the inclusion threshold."
+    "eligibility_status": "No Elegible"
   },
-  "interview_analysis": "Household of four, two adults and two children, arrived three months ago and moved twice since. They are currently in a converted garage shared with another family, without heating or running water. Neither adult speaks Spanish, only the children, and no interpreter was available, so the interview was conducted through the eldest child. One adult cannot read or write, so the forms were completed orally. There is no income at present: the father was looking for work when the workshop closed, and the mother cannot look for work while caring for the children alone. No immediate medical needs, but the youngest child has stopped attending school."
+  "analysis": "Household of four, two adults and two children, arrived three months ago and moved twice since. They are currently in a converted garage shared with another family, without heating or running water. Neither adult speaks Spanish, only the children, and no interpreter was available, so the interview was conducted through the eldest child. One adult cannot read or write, so the forms were completed orally. There is no income at present: the father was looking for work when the workshop closed, and the mother cannot look for work while caring for the children alone. No immediate medical needs, but the youngest child has stopped attending school."
 }

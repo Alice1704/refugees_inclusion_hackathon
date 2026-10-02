@@ -38,8 +38,7 @@
   },
   "decision": {
     "eligibility_target": "INCLUSION",
-    "eligibility_status": "Elegible",
-    "rule": "No administrative flag on file and the vulnerability index clears the inclusion threshold."
+    "eligibility_status": "Elegible"
   },
-  "interview_analysis": "One-person household. Housing is the one serious gap: a shared room in an overcrowded building, rent in arrears, and heating only in the evening. Food is covered by the ration card. Identification and the asylum file were in order at the appointment and no documents are pending. No health or protection concerns raised, no interpreter needed, and the person answered questions directly. The household did not ask for anything beyond housing support."
+  "analysis": "One-person household. Housing is the one serious gap: a shared room in an overcrowded building, rent in arrears, and heating only in the evening. Food is covered by the ration card. Identification and the asylum file were in order at the appointment and no documents are pending. No health or protection concerns raised, no interpreter needed, and the person answered questions directly. The household did not ask for anything beyond housing support."
 }

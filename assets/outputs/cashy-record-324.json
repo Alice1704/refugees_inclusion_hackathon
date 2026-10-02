@@ -40,5 +40,5 @@
     "eligibility_target": "INCLUSION",
     "eligibility_status": "Elegible"
   },
-  "decision_rationale": "The form scores this household as Baja with every component at its minimum, but the interview describes a family that lost its housing, has no income, and cannot reach any service because no adult speaks Spanish. I weight the account over the form here: the scorecard looks stale rather than reassuring, and the housing loss described is the kind of event the form is not updated for. On that basis I would put the household at high vulnerability and include it. I am flagging this case for the operator because the form and the account disagree outright, and that disagreement is the reason for the recommendation."
+  "analysis": "The form scores this household as Baja with every component at its minimum, but the interview describes a family that lost its housing, has no income, and cannot reach any service because no adult speaks Spanish. I weight the account over the form here: the scorecard looks stale rather than reassuring, and the housing loss described is the kind of event the form is not updated for. On that basis I would put the household at high vulnerability and include it. I am flagging this case for the operator because the form and the account disagree outright, and that disagreement is the reason for the recommendation."
 }

@@ -38,8 +38,7 @@
   },
   "decision": {
     "eligibility_target": "EXCLUSION",
-    "eligibility_status": "No Elegible por Duplicidad",
-    "rule": "The duplicate flag on file blocks inclusion whatever the vulnerability score is."
+    "eligibility_status": "No Elegible por Duplicidad"
   },
-  "interview_analysis": "Household of four, two adults and two children. The mother is the sole carer and works shifts; the father was not present and the family does not know where he is. They share a two-room dwelling with another family, and the rent is paid and current. All adults speak Spanish and the children are enrolled in the local primary school with regular attendance. No illness, disability or protection concern was reported. The family asked for help with school supplies and did not raise housing as a problem. The interview was held in Spanish without an interpreter."
+  "analysis": "Household of four, two adults and two children. The mother is the sole carer and works shifts; the father was not present and the family does not know where he is. They share a two-room dwelling with another family, and the rent is paid and current. All adults speak Spanish and the children are enrolled in the local primary school with regular attendance. No illness, disability or protection concern was reported. The family asked for help with school supplies and did not raise housing as a problem. The interview was held in Spanish without an interpreter."
 }

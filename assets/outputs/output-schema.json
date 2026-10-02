@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "UNHCR Scorecard Record (deterministic side of the judgement)",
+  "title": "UNHCR output Record",
   "type": "object",
   "required": [
     "record_id",
@@ -11,7 +11,7 @@
     "scores",
     "administrative_flags",
     "decision",
-    "interview_analysis"
+    "analysis"
   ],
   "properties": {
 
@@ -152,14 +152,11 @@
             "No Elegible por Intenciones",
             "No Elegible por Duplicidad"
           ]
-        },
-        "rule": {
-          "type": "string"
         }
       }
     },
 
-    "interview_analysis": {
+    "analysis": {
       "type": "string"
     }
   }

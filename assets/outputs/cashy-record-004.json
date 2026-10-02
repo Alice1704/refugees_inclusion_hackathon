@@ -36,9 +36,9 @@
     "intentions": 0,
     "duplicate": 0
   },
-  "target": {
+  "decision": {
     "eligibility_target": "INCLUSION",
     "eligibility_status": "Elegible"
   },
-  "decision_rationale": "The form records a vulnerability index of 2.73, moderate, and the interview agrees that housing is the only serious gap. My reading is that this is an administrative need rather than a protection one: the person is not in immediate danger and the case can be answered with rental support. Nothing in the account points to duplication or adverse intent and no accelerated procedure is pending, so I do not see a reason to depart from the scorecard and I recommend inclusion."
+  "analysis": "The form records a vulnerability index of 2.73, moderate, and the interview agrees that housing is the only serious gap. My reading is that this is an administrative need rather than a protection one: the person is not in immediate danger and the case can be answered with rental support. Nothing in the account points to duplication or adverse intent and no accelerated procedure is pending, so I do not see a reason to depart from the scorecard and I recommend inclusion."
 }
