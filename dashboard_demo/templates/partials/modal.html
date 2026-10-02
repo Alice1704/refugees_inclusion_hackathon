@@ -1,0 +1,14 @@
+{# Modal shell. Content is injected by dashboard.js. #}
+<div id="modal-backdrop" class="fixed inset-0 z-50 grid place-items-center bg-ink/60 p-4" hidden>
+  <div
+    id="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    class="w-full max-w-[460px] rounded-md border border-line bg-white"
+  >
+    <div id="modal-head" class="flex items-start gap-3 border-b border-line-soft p-4 sm:p-5"></div>
+    <div id="modal-body" class="p-4 text-[13px] leading-body text-ink-medium sm:p-5"></div>
+    <div id="modal-foot" class="flex justify-end gap-2 border-t border-line-soft p-4"></div>
+  </div>
+</div>

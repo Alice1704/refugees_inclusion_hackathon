@@ -1,0 +1,36 @@
+{# Left column: external variables and Cashy's eligibility suggestion.
+   Both are disclosure panels; contents are rendered by dashboard.js from the
+   case API. #}
+<section
+  class="flex w-full flex-col border-b border-line lg:min-h-0 lg:w-[45%] lg:border-b-0 lg:border-r"
+  aria-label="External variables and eligibility"
+>
+  <div class="overflow-y-auto px-4 py-4 sm:px-6 lg:min-h-0 lg:flex-1">
+    <!-- External variables -->
+    <details class="disclosure" open>
+      <summary class="disclosure-summary">
+        <span>External variables</span>
+        <svg class="disclosure-icon" aria-hidden="true"><use href="#i-chevron" xlink:href="#i-chevron"></use></svg>
+      </summary>
+      <div class="disclosure-body">
+        <ul id="context-list" class="space-y-0.5" aria-label="External variables checklist"></ul>
+      </div>
+    </details>
+
+    <!-- Eligibility suggestion -->
+    <details class="disclosure mt-3" open>
+      <summary class="disclosure-summary">
+        <span>Eligibility</span>
+        <svg class="disclosure-icon" aria-hidden="true"><use href="#i-chevron" xlink:href="#i-chevron"></use></svg>
+      </summary>
+      <div class="disclosure-body">
+        <div id="eligibility"></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="flex shrink-0 gap-2 border-t border-line-soft px-4 py-4 sm:px-6">
+    <button type="button" id="btn-approve" class="btn-primary flex-1">Approve inclusion</button>
+    <button type="button" id="btn-exclude" class="btn-secondary flex-1">Exclude</button>
+  </div>
+</section>
