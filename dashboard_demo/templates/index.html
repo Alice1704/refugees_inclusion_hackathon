@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Case Review · UNHCR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  </head>
+
+  {# Utility actions (presentation data only - the sidebar partial renders them). #}
+  {% set utility_items = [
+    { 'label': 'Settings', 'icon': 'i-settings' },
+    { 'label': 'Help',     'icon': 'i-help' }
+  ] %}
+
+  <body class="app-viewport m-0 w-full overflow-hidden bg-white font-body text-[13px] leading-body text-ink">
+    {% include "partials/icons.html" %}
+
+    <!-- Application shell -->
+    <div class="app-viewport flex w-full overflow-hidden bg-white">
+      <!-- Drawer backdrop (below lg only) -->
+      <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-ink/60 lg:hidden"></div>
+
+      {% include "partials/sidebar.html" %}
+
+      <!-- Workspace -->
+      <main class="flex min-w-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden">
+        {% include "partials/header.html" %}
+
+        <!-- Context + analysis columns -->
+        <div class="flex flex-col lg:min-h-0 lg:flex-1 lg:flex-row">
+          {% include "partials/context.html" %}
+          {% include "partials/analysis.html" %}
+        </div>
+      </main>
+    </div>
+
+    {% include "partials/modal.html" %}
+
+    <!-- Toast region -->
+    <div
+      id="toast-stack"
+      class="fixed bottom-4 right-4 z-[200] flex w-[calc(100%-2rem)] max-w-xs flex-col gap-2 sm:bottom-5 sm:right-5"
+      aria-live="polite"
+      aria-atomic="false"
+    ></div>
+
+    <script src="{{ url_for('static', filename='js/data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  </body>
+</html>

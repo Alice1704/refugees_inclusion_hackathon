@@ -1,0 +1,19 @@
+{# Page header: drawer toggle and the identity of the selected case.
+   Title and subtitle are set by dashboard.js once a case loads. #}
+<header class="flex h-16 shrink-0 items-center gap-3 border-b border-line bg-white px-4 sm:px-6">
+  <button
+    type="button"
+    id="sidebar-toggle"
+    class="grid h-10 w-10 shrink-0 place-items-center rounded-sm text-ink transition-colors hover:bg-brand-20 hover:text-brand-dark lg:hidden"
+    aria-label="Open navigation"
+    aria-expanded="false"
+    aria-controls="sidebar"
+  >
+    <svg class="h-5 w-5" aria-hidden="true"><use href="#i-menu" xlink:href="#i-menu"></use></svg>
+  </button>
+
+  <div class="min-w-0">
+    <h1 id="page-title" class="truncate font-heading text-lg font-bold leading-heading text-brand">Case review</h1>
+    <p id="page-subtitle" class="truncate text-xs leading-subheading text-ink-medium">Loading case…</p>
+  </div>
+</header>

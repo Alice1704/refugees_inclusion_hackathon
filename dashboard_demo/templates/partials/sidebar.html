@@ -1,0 +1,46 @@
+{# Sidebar: brand mark, case selection and the utility actions.
+   Renders as a static column at lg+ and an off-canvas drawer below lg.
+   `utility_items` is supplied by the page; the case list is rendered by
+   dashboard.js from the case API. #}
+<aside
+  id="sidebar"
+  class="fixed inset-y-0 left-0 z-40 flex w-[80%] max-w-[280px] -translate-x-full flex-col border-r border-line bg-white transition-transform duration-200 ease-out lg:static lg:z-auto lg:w-[248px] lg:max-w-none lg:translate-x-0 lg:transition-none"
+  aria-label="Sidebar"
+>
+  <!-- Brand mark (official UNHCR logo, used unmodified) -->
+  <div class="flex h-16 shrink-0 items-center border-b border-line-soft px-5">
+    <a href="/" class="inline-flex items-center rounded-sm" aria-label="UNHCR home">
+      <img src="{{ url_for('static', filename='img/unhcr-logo.svg') }}" alt="UNHCR" class="h-9 w-auto" />
+    </a>
+    <button
+      type="button"
+      id="sidebar-close"
+      class="ml-auto grid h-9 w-9 place-items-center rounded-sm text-ink-medium transition-colors hover:bg-brand-20 hover:text-brand-dark lg:hidden"
+      aria-label="Close navigation"
+    >
+      <svg class="h-5 w-5" aria-hidden="true"><use href="#i-close" xlink:href="#i-close"></use></svg>
+    </button>
+  </div>
+
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-4">
+    <!-- Case selection -->
+    <p class="nav-label" id="cases-label">Cases</p>
+    <div
+      id="case-list"
+      class="space-y-0.5"
+      role="listbox"
+      aria-labelledby="cases-label"
+      aria-orientation="vertical"
+    ></div>
+  </div>
+
+  <!-- Utility section -->
+  <div class="shrink-0 border-t border-line-soft px-3 py-3">
+    {% for item in utility_items %}
+      <button type="button" class="nav-item" data-view="{{ item.label }}">
+        <svg class="h-4 w-4 shrink-0" aria-hidden="true"><use href="#{{ item.icon }}" xlink:href="#{{ item.icon }}"></use></svg>
+        <span>{{ item.label }}</span>
+      </button>
+    {% endfor %}
+  </div>
+</aside>
