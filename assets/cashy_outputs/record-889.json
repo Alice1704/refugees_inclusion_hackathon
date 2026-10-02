@@ -1,0 +1,44 @@
+{
+  "record_id": 889,
+  "interview": {
+    "month": "2024-04",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 4,
+    "dependency_category": "average",
+    "female_headed": false,
+    "sole_carer": true,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 1.0,
+    "language_barrier": 1.0,
+    "specific_needs": 2.578385269,
+    "documentation": 1.0,
+    "score": 8.975915299
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.0,
+    "housing": 2.117608696,
+    "negative_coping": 2.580217391,
+    "dependency": 1.738466184,
+    "score": 27.07165714
+  },
+  "scores": {
+    "final_score": 35.46523337081478,
+    "vulnerability_index": 3.022741649,
+    "vulnerability_category": "Vulnerabilidad Elevada"
+  },
+  "administrative_flags": {
+    "asylum_procedure": null,
+    "intentions": 0,
+    "duplicate": -500
+  },
+  "target": {
+    "eligibility_target": "INCLUSION",
+    "eligibility_status": "Elegible"
+  },
+  "decision_rationale": "The account describes a settled household: a working sole carer, Spanish-speaking adults, children in school, rent paid and no protection concern. I read the recorded vulnerability of 3.02 as inflated by crowded housing and dependency items that the form applies generically, and I score this household as low priority. On that reading it should be served rather than left on the waiting list, so I recommend inclusion. I have nothing on record that would hold the case back, and the family's own presentation is coherent and consistent."
+}

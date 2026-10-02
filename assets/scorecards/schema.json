@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "UNHCR Cashy — Household Record (S8 synthetic sample)",
+  "title": "UNHCR Scorecard Record (deterministic side of the judgement)",
   "type": "object",
   "required": [
     "record_id",
@@ -10,7 +10,8 @@
     "needs_and_coping",
     "scores",
     "administrative_flags",
-    "target"
+    "decision",
+    "interview_analysis"
   ],
   "properties": {
 
@@ -134,7 +135,7 @@
       }
     },
 
-    "target": {
+    "decision": {
       "type": "object",
       "properties": {
         "eligibility_target": {
@@ -151,12 +152,15 @@
             "No Elegible por Intenciones",
             "No Elegible por Duplicidad"
           ]
+        },
+        "rule": {
+          "type": "string"
         }
       }
     },
 
-    "decision_rationale": {
-      "type": ["string", "null"]
+    "interview_analysis": {
+      "type": "string"
     }
   }
 }

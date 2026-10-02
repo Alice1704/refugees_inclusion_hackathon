@@ -1,0 +1,16 @@
+{
+  "record_id": 4,
+  "month": "2023-10",
+  "office": "foten",
+  "description": "October was still open when the case was processed, with places left unassigned at the time of the appointment. The origin country is not in an active conflict area, the office recorded no security incident, and nothing in the file points to discrimination or activism. An interpreter was available but not needed. Nothing in the context pushed the case either way, so the recommendation turned only on the recorded vulnerability.",
+  "external_variables": {
+    "budget_places_available": 150,
+    "budget_places_assigned": 120,
+    "origin_country_conflict": false,
+    "security_exposure": "low",
+    "displacement_stage": "settled",
+    "sex_or_sexuality_discrimination": false,
+    "activism_exposure": false,
+    "interpretation_available": true
+  }
+}

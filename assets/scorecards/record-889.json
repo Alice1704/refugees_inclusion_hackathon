@@ -1,0 +1,45 @@
+{
+  "record_id": 889,
+  "interview": {
+    "month": "2024-04",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 4,
+    "dependency_category": "average",
+    "female_headed": false,
+    "sole_carer": true,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 1.0,
+    "language_barrier": 1.0,
+    "specific_needs": 2.578385269,
+    "documentation": 1.0,
+    "score": 8.975915299
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.0,
+    "housing": 2.117608696,
+    "negative_coping": 2.580217391,
+    "dependency": 1.738466184,
+    "score": 27.07165714
+  },
+  "scores": {
+    "final_score": 35.46523337081478,
+    "vulnerability_index": 3.022741649,
+    "vulnerability_category": "Vulnerabilidad Elevada"
+  },
+  "administrative_flags": {
+    "asylum_procedure": null,
+    "intentions": 0,
+    "duplicate": -500
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "No Elegible por Duplicidad",
+    "rule": "The duplicate flag on file blocks inclusion whatever the vulnerability score is."
+  },
+  "interview_analysis": "Household of four, two adults and two children. The mother is the sole carer and works shifts; the father was not present and the family does not know where he is. They share a two-room dwelling with another family, and the rent is paid and current. All adults speak Spanish and the children are enrolled in the local primary school with regular attendance. No illness, disability or protection concern was reported. The family asked for help with school supplies and did not raise housing as a problem. The interview was held in Spanish without an interpreter."
+}
