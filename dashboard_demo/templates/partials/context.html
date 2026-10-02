@@ -1,13 +1,10 @@
-{# Left column: external variables and Cashy's eligibility suggestion.
-   Both are disclosure panels; contents are rendered by dashboard.js from the
-   case API. #}
+{# Left column: context, Cashy's suggestion, and the operator's review controls. #}
 <section
   class="flex w-full flex-col border-b border-line lg:min-h-0 lg:w-[45%] lg:border-b-0 lg:border-r"
-  aria-label="External variables and eligibility"
+  aria-label="External variables, Cashy suggestion, and review"
 >
   <div class="overflow-y-auto px-4 py-4 sm:px-6 lg:min-h-0 lg:flex-1">
-    <!-- External variables -->
-    <details class="disclosure" open>
+    <details class="disclosure">
       <summary class="disclosure-summary">
         <span>External variables</span>
         <svg class="disclosure-icon" aria-hidden="true"><use href="#i-chevron" xlink:href="#i-chevron"></use></svg>
@@ -17,20 +14,26 @@
       </div>
     </details>
 
-    <!-- Eligibility suggestion -->
-    <details class="disclosure mt-3" open>
+    <details id="eligibility-disclosure" class="disclosure mt-3">
       <summary class="disclosure-summary">
-        <span>Eligibility</span>
+        <span>Cashy suggestion</span>
         <svg class="disclosure-icon" aria-hidden="true"><use href="#i-chevron" xlink:href="#i-chevron"></use></svg>
       </summary>
       <div class="disclosure-body">
         <div id="eligibility"></div>
       </div>
     </details>
+    <p id="eligibility-lock-note" class="mt-2 text-[11px] leading-body text-ink-medium" hidden>
+      Cashy's suggestion is locked for this case.
+    </p>
   </div>
 
-  <div class="flex shrink-0 gap-2 border-t border-line-soft px-4 py-4 sm:px-6">
-    <button type="button" id="btn-approve" class="btn-primary flex-1">Approve inclusion</button>
-    <button type="button" id="btn-exclude" class="btn-secondary flex-1">Exclude</button>
+  <div class="shrink-0 border-t border-line-soft px-4 py-4 sm:px-6">
+    <p id="review-status" class="mb-2 text-[11px] leading-body text-ink-medium" role="status"></p>
+    <button type="button" id="btn-survey" class="btn-primary mb-2 w-full" hidden>Continue to survey</button>
+    <div class="flex gap-2">
+      <button type="button" id="btn-approve" class="btn-primary flex-1" disabled>Approve inclusion</button>
+      <button type="button" id="btn-exclude" class="btn-secondary flex-1" disabled>Exclude</button>
+    </div>
   </div>
 </section>

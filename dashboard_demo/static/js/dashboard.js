@@ -5,9 +5,10 @@
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
   const { ELIGIBILITY_COPY, ANALYSIS_COPY, CHECKLIST_COPY } = window.UiData;
 
-  /* Current selection. The case list is fetched once; the detail is fetched per
-     case so the browser never holds more than one record's payload. */
-  const state = { recordIds: [], selectedId: null };
+  const state = {
+    cases: [], recordIds: [], pendingIds: new Set(), remindedIds: new Set(),
+    selectedId: null, selectionVersion: 0, reviewStatus: "pending", review: null,
+  };
 
   /* Escape interpolated values before they enter markup. Labels come from the
      API and analysis text is model output, so neither is trusted as HTML. */
@@ -82,25 +83,6 @@
     return !$("#modal-backdrop").hidden;
   }
 
-  function confirmAction(opts) {
-    openModal({
-      title: opts.title,
-      description: opts.description,
-      body: opts.body || "",
-      footer:
-        '<button type="button" class="btn-quiet" data-modal-close>Cancel</button>' +
-        '<button type="button" class="btn-primary" id="confirm-ok">' +
-        (opts.confirmText || "Confirm") +
-        "</button>",
-      onMount: () => {
-        $("#confirm-ok").addEventListener("click", () => {
-          closeModal();
-          if (opts.onConfirm) opts.onConfirm();
-        });
-      },
-    });
-  }
-
   function trapFocus(e) {
     if (!isModalOpen() || e.key !== "Tab") return;
     const focusables = $$(
@@ -148,53 +130,41 @@
           '<span class="block truncate text-[13px] font-medium">Case ' +
           esc(String(c.record_id).padStart(3, "0")) +
           "</span>" +
-          '<span class="block truncate text-[11px]">' + esc(meta) + "</span>" +
+          '<span class="block truncate text-[11px]">' + esc(meta) +
+          (state.pendingIds.has(c.record_id) ? " · Pending" : " · Awaiting survey") +
+          "</span>" +
           "</span></button>"
         );
       })
       .join("");
   }
 
-  /* ---------------------------------------------------------
-     Context checklist
-     --------------------------------------------------------- */
-
-  function checklistValue(variable) {
-    if (variable.kind === "boolean") {
-      const on = variable.value === true;
-      return (
-        '<span class="check ' + (on ? "is-checked" : "") + '" role="img" ' +
-        'aria-label="' + (on ? CHECKLIST_COPY.checked : CHECKLIST_COPY.unchecked) + '">' +
-        '<svg class="h-3 w-3" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-        'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>' +
-        "</span>"
-      );
-    }
-    return '<span class="dot-value">' + esc(variable.value) + "</span>";
-  }
-
   function renderContext(detail) {
     const variables = detail.variables || [];
-    if (!variables.length) {
-      $("#context-list").innerHTML =
-        '<li class="px-2.5 py-2 text-[11px] text-ink-medium">No context variables recorded.</li>';
-      return;
-    }
-
-    $("#context-list").innerHTML = variables
-      .map(
-        (v) =>
-          '<li class="check-row' + (v.kind === "boolean" ? " is-boolean" : "") + '">' +
-          '<span class="min-w-0 flex-1 text-[13px] leading-body text-ink">' + esc(v.label) + "</span>" +
-          checklistValue(v) +
-          "</li>"
-      )
-      .join("");
+    $("#context-list").innerHTML = variables.length
+      ? variables.map((variable) => {
+        const value = variable.kind === "boolean"
+          ? (variable.value ? CHECKLIST_COPY.checked : CHECKLIST_COPY.unchecked)
+          : String(variable.value);
+        return '<li class="check-row"><span class="min-w-0 flex-1 text-[13px] leading-body text-ink">' +
+          esc(variable.label) + '</span><span class="dot-value">' + esc(value) + "</span></li>";
+      }).join("")
+      : '<li class="px-2.5 py-2 text-[11px] text-ink-medium">No external variables recorded.</li>';
   }
 
   /* ---------------------------------------------------------
      Eligibility suggestion + analysis
      --------------------------------------------------------- */
+
+  function lockEligibility(locked) {
+    const disclosure = $("#eligibility-disclosure");
+    const summary = disclosure.querySelector("summary");
+    disclosure.open = false;
+    summary.tabIndex = locked ? -1 : 0;
+    summary.setAttribute("aria-disabled", String(locked));
+    $("#eligibility-lock-note").hidden = !locked;
+    if (locked) $("#eligibility").textContent = "";
+  }
 
   function renderEligibility(eligibility) {
     const panel = $("#eligibility");
@@ -228,6 +198,105 @@
     else el.innerHTML = '<span class="text-ink-medium">' + esc(ANALYSIS_COPY.empty) + "</span>";
   }
 
+  function renderReviewStatus(survey) {
+    state.reviewStatus = survey.status;
+    state.review = survey.review;
+    const editable = survey.status === "pending" || survey.status === "awaiting_survey";
+    const revising = survey.status === "awaiting_survey";
+    const approveButton = $("#btn-approve");
+    const excludeButton = $("#btn-exclude");
+    approveButton.disabled = !editable;
+    excludeButton.disabled = !editable;
+    approveButton.textContent = revising ? "Revise: approve" : "Approve inclusion";
+    excludeButton.textContent = revising ? "Revise: exclude" : "Exclude";
+    approveButton.classList.toggle("btn-primary", !revising);
+    approveButton.classList.toggle("btn-secondary", revising);
+    $("#btn-survey").hidden = survey.status !== "awaiting_survey";
+    $("#review-status").textContent = survey.status === "pending"
+      ? "Pending operator decision. Your choice is independent of Cashy's suggestion."
+      : survey.status === "awaiting_survey"
+        ? "Decision saved. You can revise it until the survey is completed."
+        : "Case completed.";
+  }
+
+  function openSurveyDialog(recordId) {
+    openModal({
+      title: "Operator survey",
+      description: "Case " + String(recordId).padStart(3, "0") + " · Decision saved",
+      body: '<p>The survey questions are coming soon. This case remains awaiting survey.</p>',
+      footer: '<button type="button" class="btn-primary" data-modal-close>Back to review</button>',
+    });
+  }
+
+  function maybeShowReminder(recordId) {
+    if (state.remindedIds.has(recordId)) return;
+    state.remindedIds.add(recordId);
+    if (Math.random() >= 0.2) return;
+    openModal({
+      title: "Review with care",
+      body: "<p>All data has been processed by AI and could be wrong. Keep an independent, critical eye on this case.</p>",
+      footer: '<button type="button" class="btn-primary" data-modal-close>Continue review</button>',
+    });
+  }
+
+  function showCriticalWarning(recordId) {
+    openModal({
+      title: "Critical case: review with care",
+      description: "Case " + String(recordId).padStart(3, "0"),
+      body: "<p>The judgement engine flagged an elevated bias risk. Review the external variables and Cashy's analysis carefully. AI-processed data may be wrong.</p>",
+      footer: '<button type="button" class="btn-primary" data-modal-close>Continue review</button>',
+    });
+  }
+
+  function startReview(decision) {
+    if (state.selectedId === null ||
+        !["pending", "awaiting_survey"].includes(state.reviewStatus)) return;
+    const recordId = state.selectedId;
+    const approve = decision === "approved";
+    const editing = state.reviewStatus === "awaiting_survey";
+    openModal({
+      title: approve ? "Approve inclusion?" : "Exclude this case?",
+      description: "Case " + String(recordId).padStart(3, "0") +
+        " · Your decision is independent of Cashy's suggestion.",
+      body: '<label for="review-reason" class="field-label">Reason for your decision</label>' +
+        '<textarea id="review-reason" class="field h-24 py-2" required></textarea>' +
+        '<p id="review-error" class="mt-2 text-[12px] text-ink" role="alert"></p>',
+      footer: '<button type="button" class="btn-quiet" data-modal-close>Cancel</button>' +
+        '<button type="button" class="btn-primary" id="confirm-ok">' +
+        (editing ? "Update decision" : (approve ? "Approve" : "Exclude")) + "</button>",
+      onMount: () => {
+        if (editing && state.review) $("#review-reason").value = state.review.reason;
+        $("#confirm-ok").addEventListener("click", async () => {
+          const reason = $("#review-reason").value.trim();
+          if (!reason) {
+            $("#review-error").textContent = "Please provide a reason.";
+            $("#review-reason").focus();
+            return;
+          }
+          $("#confirm-ok").disabled = true;
+          try {
+            await window.CaseApi.review(recordId, decision, reason, editing);
+            state.pendingIds.delete(recordId);
+            renderCaseList(state.cases);
+            if (state.selectedId === recordId) {
+              setActiveCase(recordId);
+              renderReviewStatus({
+                status: "awaiting_survey", review: { decision, reason },
+              });
+            }
+            if (isModalOpen() && $("#review-reason")) closeModal();
+            if (state.selectedId === recordId) openSurveyDialog(recordId);
+            toast(editing ? "Decision updated" : "Decision recorded",
+              "Case awaiting the operator survey.");
+          } catch (err) {
+            if ($("#review-error")) $("#review-error").textContent = err.message || "Could not save the decision.";
+            if ($("#confirm-ok")) $("#confirm-ok").disabled = false;
+          }
+        });
+      },
+    });
+  }
+
   /* ---------------------------------------------------------
      Case selection
      --------------------------------------------------------- */
@@ -246,26 +315,57 @@
 
   async function selectCase(recordId, options) {
     const opts = options || {};
+    const version = ++state.selectionVersion;
     setActiveCase(recordId);
+    // Clear the previous case before requesting the new comparison.
+    $("#context-list").textContent = "";
+    $("#context-list").closest("details").open = false;
+    lockEligibility(false);
+    $("#eligibility").textContent = "";
+    $("#analysis-body").textContent = "";
+    $("#review-status").textContent = "Loading case...";
+    $("#btn-survey").hidden = true;
+    $("#btn-approve").disabled = true;
+    $("#btn-exclude").disabled = true;
+    state.reviewStatus = "loading";
+    state.review = null;
 
-    let detail;
+    let detail, cashy, comparison, survey;
     try {
-      detail = await window.CaseApi.getCase(recordId);
+      [detail, cashy, comparison, survey] = await Promise.all([
+        window.CaseApi.getCase(recordId),
+        window.CaseApi.getCashy(recordId),
+        window.CaseApi.getComparison(recordId),
+        window.CaseApi.getSurvey(recordId),
+      ]);
     } catch (err) {
-      toast("Could not load case", "The case data could not be retrieved.");
+      if (version === state.selectionVersion) {
+        toast("Could not load case", "The case data could not be retrieved.");
+      }
       return;
     }
 
     // Guard against a slow response landing after a newer selection.
-    if (state.selectedId !== recordId) return;
+    if (version !== state.selectionVersion) return;
 
     const label = "Case " + String(recordId).padStart(3, "0");
+    const summary = state.cases.find((item) => item.record_id === recordId) || {};
     $("#page-title").textContent = label;
-    $("#page-subtitle").textContent = [detail.month, detail.office].filter(Boolean).join(" · ");
+    $("#page-subtitle").textContent = [summary.month, summary.office].filter(Boolean).join(" · ");
 
     renderContext(detail);
-    renderEligibility(detail.eligibility);
-    renderAnalysis(detail.analysis);
+    const locked = comparison.text_match_percentage < comparison.threshold;
+    lockEligibility(locked);
+    const suggestion = cashy.target || cashy.decision || {};
+    if (!locked) {
+      renderEligibility({
+        target: suggestion.eligibility_target, status: suggestion.eligibility_status,
+      });
+    }
+    renderAnalysis(cashy.analysis);
+    renderReviewStatus(survey);
+    if (comparison.show_warning) showCriticalWarning(recordId);
+    else maybeShowReminder(recordId);
 
     if (opts.announce) toast("Case selected", label + " is now the active case.");
   }
@@ -366,24 +466,16 @@
     $("#case-list").addEventListener("keydown", onCaseListKeydown);
 
     /* ---- Detail actions ---- */
-    $("#btn-approve").addEventListener("click", () => {
-      const label = "Case " + String(state.selectedId).padStart(3, "0");
-      confirmAction({
-        title: "Approve inclusion?",
-        description: label + " will be marked as included.",
-        confirmText: "Approve",
-        onConfirm: () => toast("Inclusion approved", label + " marked as approved."),
-      });
+    $("#btn-approve").addEventListener("click", () => startReview("approved"));
+    $("#btn-exclude").addEventListener("click", () => startReview("rejected"));
+    $("#btn-survey").addEventListener("click", () => openSurveyDialog(state.selectedId));
+    $("#eligibility-disclosure").addEventListener("toggle", (event) => {
+      if (event.target.querySelector("summary").getAttribute("aria-disabled") === "true") {
+        event.target.open = false;
+      }
     });
-
-    $("#btn-exclude").addEventListener("click", () => {
-      const label = "Case " + String(state.selectedId).padStart(3, "0");
-      confirmAction({
-        title: "Exclude this case?",
-        description: label + " will be marked as excluded.",
-        confirmText: "Exclude",
-        onConfirm: () => toast("Case excluded", label + " marked as excluded."),
-      });
+    $("#eligibility-disclosure summary").addEventListener("click", (event) => {
+      if (event.currentTarget.getAttribute("aria-disabled") === "true") event.preventDefault();
     });
 
     /* ---- Modal + global keyboard ---- */
@@ -398,8 +490,10 @@
     });
 
     /* ---- Load cases, then the first one ---- */
-    window.CaseApi.getCases()
-      .then((cases) => {
+    Promise.all([window.CaseApi.getCases(), window.CaseApi.getPending()])
+      .then(([cases, pendingIds]) => {
+        state.cases = cases;
+        state.pendingIds = new Set(pendingIds);
         state.recordIds = cases.map((c) => c.record_id);
         if (!state.recordIds.length) {
           renderCaseList([]);

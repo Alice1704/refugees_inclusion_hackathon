@@ -11,7 +11,7 @@
   const ELIGIBILITY_COPY = {
     heading: "Eligibility suggestion",
     caution:
-      "Cashy's suggestion, not a decision. Review the context below before you act on it.",
+      "Cashy's suggestion, not a decision. Review the analysis before you act on it.",
     empty: "No eligibility suggestion was produced for this case.",
   };
 
@@ -20,7 +20,6 @@
     empty: "No analysis was produced for this case.",
   };
 
-  /* Boolean context variables read as a checklist. */
   const CHECKLIST_COPY = { checked: "Yes", unchecked: "No" };
 
   window.UiData = { ELIGIBILITY_COPY, ANALYSIS_COPY, CHECKLIST_COPY };

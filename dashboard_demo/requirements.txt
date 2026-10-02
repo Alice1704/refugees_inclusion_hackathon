@@ -1,1 +1,6 @@
 Flask>=3.0,<4.0
+numpy>=1.26
+# Semantic matcher backend, same order as the notebook: sentence-transformers first,
+# FastEmbed (ONNX) as the fallback when torch is unavailable.
+sentence-transformers>=3.0,<6.0
+fastembed>=0.8,<1.0
