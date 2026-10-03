@@ -46,15 +46,27 @@
     return request("/api/survey/" + encodeURIComponent(recordId));
   }
 
-  function review(recordId, decision, reason, editing) {
+  function review(recordId, decision, editing, reason) {
+    const body = { decision };
+    if (reason !== undefined && reason !== null && reason !== '') {
+      body.reason = reason;
+    }
     return request("/api/case/" + encodeURIComponent(recordId) + "/review", {
       method: editing ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ decision, reason }),
+      body: JSON.stringify(body),
+    });
+  }
+
+  function submitSurvey(recordId, answers) {
+    return request("/api/survey/" + encodeURIComponent(recordId), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers }),
     });
   }
 
   window.CaseApi = {
-    getCases, getPending, getCase, getCashy, getComparison, getSurvey, review,
+    getCases, getPending, getCase, getCashy, getComparison, getSurvey, review, submitSurvey,
   };
 })();

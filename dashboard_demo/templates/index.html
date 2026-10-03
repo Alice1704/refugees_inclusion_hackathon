@@ -23,8 +23,9 @@
 
       {% include "partials/sidebar.html" %}
 
-      <!-- Workspace -->
-      <main class="flex min-w-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden">
+      <!-- Workspace. aria-busy starts set because the cases arrive from script;
+           dashboard.js clears it when the loading screen comes down. -->
+      <main class="flex min-w-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden" aria-busy="true">
         {% include "partials/header.html" %}
 
         <!-- Context + analysis columns -->
@@ -36,6 +37,9 @@
     </div>
 
     {% include "partials/modal.html" %}
+
+    {# Covers the app while the backend loads the model's weights. #}
+    {% include "partials/loading.html" %}
 
     <!-- Toast region -->
     <div

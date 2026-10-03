@@ -218,10 +218,25 @@
   .field {
     @apply h-9 w-full rounded-sm border border-line bg-white px-2.5 text-[13px] text-ink transition-colors hover:border-ink-light focus:border-brand;
   }
+  /* A free-text answer, so it grows with the answer instead of holding one line.
+     Same border and focus treatment as .field, without the fixed height. */
+  .field-area {
+    @apply w-full resize-y rounded-sm border border-line bg-white px-2.5 py-2 text-[13px] leading-body text-ink transition-colors hover:border-ink-light focus:border-brand;
+  }
+  /* Character count against the cap the server enforces. The palette has no
+     alarm colour, so the limit reads through weight and the darker ink step
+     rather than a red the rest of the interface never uses. */
+  .field-counter {
+    @apply mt-1 text-right text-[11px] tabular-nums text-ink-medium;
+  }
+  .field-counter.is-at-cap {
+    @apply font-semibold text-ink;
+  }
   /* WebKit (iOS Safari) zooms the page when a control under 16px receives focus.
      Bump form controls to 16px on small screens so the layout does not jump. */
   @media (max-width: 640px) {
-    .field {
+    .field,
+    .field-area {
       font-size: 16px;
     }
   }
@@ -301,4 +316,47 @@
   .caution-icon {
     @apply mt-px h-3.5 w-3.5 shrink-0 text-ink-medium;
   }
+
+  /* ---- Loading screen ----
+     Shown while the backend reads the embedding model's weights on the first
+     comparison. Opaque rather than translucent: it covers the half-rendered case
+     underneath, and a backdrop over stale content reads as an error state. */
+  .loading-screen {
+    @apply fixed inset-0 z-[300] grid place-items-center bg-white p-4;
+  }
+  /* Same surface treatment as the modal shell, with a brand rule instead of a
+     shadow to lead the eye - no drop shadow is needed on an opaque backdrop.
+     Narrower than the modal because the content is one line and a bar. */
+  .loading-card {
+    @apply w-full max-w-[300px] rounded-md border border-line border-t-4 border-t-brand bg-white p-5;
+  }
+  .loading-track {
+    @apply relative mt-3.5 h-1 w-full overflow-hidden rounded-full bg-brand-20;
+  }
+  /* Indeterminate sweep. The backend exposes no byte-level progress, so the fill
+     travels rather than filling: a bar that stopped at a percentage would be
+     reporting a number nobody measured. */
+  .loading-bar {
+    @apply absolute inset-y-0 left-0 w-2/5 rounded-full bg-brand;
+    animation: loading-sweep 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  /* With motion reduced the sweep stops. The fill rests part-way across, which
+     still reads as "working, amount unknown" without animating. */
+  @media (prefers-reduced-motion: reduce) {
+    .loading-bar {
+      left: 30%;
+      width: 40%;
+      animation: none;
+    }
+  }
 }
+
+@keyframes loading-sweep {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+

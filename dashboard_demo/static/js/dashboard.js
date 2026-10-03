@@ -10,6 +10,67 @@
     selectedId: null, selectionVersion: 0, reviewStatus: "pending", review: null,
   };
 
+  /* ---------------------------------------------------------
+     Loading screen
+
+     Two different waits share one screen. The first paint has nothing behind it
+     yet - the case list is empty until the fetch resolves - so it claims the
+     screen outright. A case switch is different: a comparison answered from warm
+     weights returns in ~20ms, so that one waits SHOW_AFTER_MS first and usually
+     never appears.
+     --------------------------------------------------------- */
+
+  // Long enough that a comparison answered from warm weights never flashes the
+  // screen, short enough that a real load does not feel stalled.
+  const SHOW_AFTER_MS = 350;
+
+  const activeLoaders = new Set();
+
+  /* Claim the loading screen for `delay` milliseconds - pass 0 to take it now.
+     Returns a release function that is safe to call more than once.
+
+     Each claim owns its own timer rather than sharing one, so switching case
+     mid-load cannot let a superseded comparison cancel the timer of the one that
+     replaced it. The screen clears once nothing is holding it: no claim has
+     revealed it and none is still waiting to, which is checked rather than
+     counted so the order claims are released in does not matter. */
+  function claimLoading(delay) {
+    const claim = { timer: null, shown: false };
+    activeLoaders.add(claim);
+
+    const reveal = () => {
+      claim.timer = null;
+      const screen = $("#loading-screen");
+      if (!screen) return;
+      // Already visible for the first paint, so this is a no-op there; kept so
+      // both callers go through one path.
+      screen.hidden = false;
+      $("main").setAttribute("aria-busy", "true");
+      claim.shown = true;
+    };
+
+    if (delay > 0) claim.timer = window.setTimeout(reveal, delay);
+    else reveal();
+
+    return function release() {
+      activeLoaders.delete(claim);
+      if (claim.timer !== null) {
+        window.clearTimeout(claim.timer);
+        claim.timer = null;
+      }
+      const held = Array.from(activeLoaders).some((other) => other.shown || other.timer !== null);
+      if (held) return;
+      const screen = $("#loading-screen");
+      if (!screen) return;
+      screen.hidden = true;
+      $("main").removeAttribute("aria-busy");
+    };
+  }
+
+  function watchModelLoad() {
+    return claimLoading(SHOW_AFTER_MS);
+  }
+
   /* Escape interpolated values before they enter markup. Labels come from the
      API and analysis text is model output, so neither is trusted as HTML. */
   function esc(value) {
@@ -219,13 +280,129 @@
         : "Case completed.";
   }
 
-  function openSurveyDialog(recordId) {
-    openModal({
-      title: "Operator survey",
-      description: "Case " + String(recordId).padStart(3, "0") + " · Decision saved",
-      body: '<p>The survey questions are coming soon. This case remains awaiting survey.</p>',
-      footer: '<button type="button" class="btn-primary" data-modal-close>Back to review</button>',
-    });
+  async function openSurveyDialog(recordId) {
+    try {
+      const survey = await window.CaseApi.getSurvey(recordId);
+      let bodyHtml = '';
+      if (survey.questions && survey.questions.length) {
+        survey.questions.forEach((q, idx) => {
+          // A set of radios or checkboxes is one control, so it is a fieldset
+          // with a legend. A <label for> would dangle - no input carries the bare
+          // q-<id> - and the options would be announced without the question.
+          // Text and rating keep a real label because those do have that id.
+          const isGroup = !!(q.options && q.type !== 'text' && q.type !== 'rating');
+          const tag = isGroup ? 'fieldset' : 'div';
+          bodyHtml += '<' + tag + ' class="mb-4">';
+          if (isGroup) {
+            bodyHtml += '<legend class="field-label">' + esc(q.text) + '</legend>';
+          } else {
+            bodyHtml += '<label class="field-label" for="q-' + esc(q.id) + '">' + esc(q.text) + '</label>';
+          }
+          if (q.type === 'text') {
+            // maxlength is the browser's half of the cap; the server enforces the
+            // other half, so a paste longer than the cap is cut rather than sent.
+            bodyHtml += '<textarea class="field-area" rows="4" id="q-' + esc(q.id) + '" data-qid="' +
+              esc(q.id) + '" maxlength="' + esc(q.max_length) + '" placeholder="' +
+              esc(q.placeholder || '') + '"></textarea>';
+            bodyHtml += '<div class="field-counter" data-counter-for="' + esc(q.id) + '">0 / ' +
+              esc(q.max_length) + '</div>';
+          } else if (q.type === 'rating' && q.options) {
+            bodyHtml += '<select class="field mt-2" id="q-' + esc(q.id) + '" data-qid="' + esc(q.id) + '">';
+            q.options.forEach(o => {
+              bodyHtml += '<option value="' + esc(o) + '">' + esc(o) + '</option>';
+            });
+            bodyHtml += '</select>';
+          } else if (q.type === 'multiple' && q.options) {
+            q.options.forEach(o => {
+              bodyHtml += '<div class="mt-2 flex items-center gap-2">';
+              bodyHtml += '<input type="checkbox" id="q-' + esc(q.id) + '-' + idx + '-' + esc(o) + '" data-qid="' + esc(q.id) + '" value="' + esc(o) + '">';
+              bodyHtml += '<label for="q-' + esc(q.id) + '-' + idx + '-' + esc(o) + '">' + esc(o) + '</label>';
+              bodyHtml += '</div>';
+            });
+          } else if (q.options) {
+            q.options.forEach(o => {
+              bodyHtml += '<div class="mt-2 flex items-center gap-2">';
+              bodyHtml += '<input type="radio" name="' + esc(q.id) + '" data-qid="' + esc(q.id) + '" value="' + esc(o) + '" id="q-' + esc(q.id) + '-' + esc(o) + '">';
+              bodyHtml += '<label for="q-' + esc(q.id) + '-' + esc(o) + '">' + esc(o) + '</label>';
+              bodyHtml += '</div>';
+            });
+          }
+          bodyHtml += '</' + tag + '>';
+        });
+      } else {
+        bodyHtml = '<p>The survey questions are coming soon. This case remains awaiting survey.</p>';
+      }
+      openModal({
+        title: "Operator survey",
+        description: "Case " + String(recordId).padStart(3, "0") + " · Decision saved",
+        body: bodyHtml,
+        footer: '<button type="button" class="btn-quiet" data-modal-close>Cancel</button><button type="button" class="btn-primary" id="survey-submit">Submit survey</button>',
+        onMount: () => {
+          // Count against the same number the server will enforce, so what the
+          // operator sees is what they are judged against.
+          $$("[data-counter-for]").forEach(counter => {
+            const qid = counter.dataset.counterFor;
+            const field = $('textarea[data-qid="' + qid + '"]');
+            const max = Number(field.getAttribute("maxlength"));
+            const paint = () => {
+              const used = field.value.length;
+              counter.textContent = used + " / " + max;
+              counter.classList.toggle("is-at-cap", used >= max);
+            };
+            field.addEventListener("input", paint);
+            paint();
+          });
+          $("#survey-submit").addEventListener("click", async () => {
+            const answers = {};
+            survey.questions && survey.questions.forEach(q => {
+              if (q.type === 'text') {
+                const field = $('textarea[data-qid="' + q.id + '"]');
+                answers[q.id] = field ? field.value.trim() : '';
+              } else if (q.type === 'multiple') {
+                answers[q.id] = [];
+                $$('input[data-qid="' + q.id + '"]:checked').forEach(cb => {
+                  answers[q.id].push(cb.value);
+                });
+              } else if (q.type === 'rating') {
+                const sel = $('select[data-qid="' + q.id + '"]');
+                answers[q.id] = sel ? sel.value : '';
+              } else {
+                const checked = $('input[data-qid="' + q.id + '"]:checked');
+                answers[q.id] = checked ? checked.value : '';
+              }
+            });
+            try {
+              await window.CaseApi.submitSurvey(recordId, answers);
+              if (isModalOpen()) closeModal();
+              // The case is finished, so it leaves the list and the operator
+              // moves on instead of sitting on a case that is no longer theirs
+              // to complete. The server drops it from /api/cases too; doing it
+              // here keeps the list honest without waiting for a reload.
+              const at = state.cases.findIndex((c) => c.record_id === recordId);
+              state.cases = state.cases.filter((c) => c.record_id !== recordId);
+              state.recordIds = state.cases.map((c) => c.record_id);
+              state.pendingIds.delete(recordId);
+              const next = state.cases[Math.min(at, state.cases.length - 1)];
+              if (next) {
+                renderCaseList(state.cases);
+                await selectCase(next.record_id);
+              } else {
+                state.selectedId = null;
+                renderCaseList([]);
+                renderReviewStatus({ status: "completed", review: survey.review });
+              }
+              toast("Survey submitted", next
+                ? "Moving to the next case."
+                : "That was the last case. The list is empty.");
+            } catch (err) {
+              toast("Error", err.message);
+            }
+          });
+        },
+      });
+    } catch (err) {
+      toast("Error", err.message);
+    }
   }
 
   function maybeShowReminder(recordId) {
@@ -258,33 +435,24 @@
       title: approve ? "Approve inclusion?" : "Exclude this case?",
       description: "Case " + String(recordId).padStart(3, "0") +
         " · Your decision is independent of Cashy's suggestion.",
-      body: '<label for="review-reason" class="field-label">Reason for your decision</label>' +
-        '<textarea id="review-reason" class="field h-24 py-2" required></textarea>' +
-        '<p id="review-error" class="mt-2 text-[12px] text-ink" role="alert"></p>',
+      body: '<p id="review-error" class="mt-2 text-[12px] text-ink" role="alert"></p>',
       footer: '<button type="button" class="btn-quiet" data-modal-close>Cancel</button>' +
         '<button type="button" class="btn-primary" id="confirm-ok">' +
         (editing ? "Update decision" : (approve ? "Approve" : "Exclude")) + "</button>",
       onMount: () => {
-        if (editing && state.review) $("#review-reason").value = state.review.reason;
         $("#confirm-ok").addEventListener("click", async () => {
-          const reason = $("#review-reason").value.trim();
-          if (!reason) {
-            $("#review-error").textContent = "Please provide a reason.";
-            $("#review-reason").focus();
-            return;
-          }
           $("#confirm-ok").disabled = true;
           try {
-            await window.CaseApi.review(recordId, decision, reason, editing);
+            await window.CaseApi.review(recordId, decision, editing);
             state.pendingIds.delete(recordId);
             renderCaseList(state.cases);
             if (state.selectedId === recordId) {
               setActiveCase(recordId);
               renderReviewStatus({
-                status: "awaiting_survey", review: { decision, reason },
+                status: "awaiting_survey", review: { decision },
               });
             }
-            if (isModalOpen() && $("#review-reason")) closeModal();
+            if (isModalOpen()) closeModal();
             if (state.selectedId === recordId) openSurveyDialog(recordId);
             toast(editing ? "Decision updated" : "Decision recorded",
               "Case awaiting the operator survey.");
@@ -331,6 +499,11 @@
     state.review = null;
 
     let detail, cashy, comparison, survey;
+    // Only the comparison touches the model, so only it arms the loading screen.
+    // try/finally rather than .finally() on the promise, because the same stop
+    // function has to cover the failure path and the superseded-by-a-newer-
+    // selection early return below.
+    const stopLoading = watchModelLoad();
     try {
       [detail, cashy, comparison, survey] = await Promise.all([
         window.CaseApi.getCase(recordId),
@@ -339,11 +512,13 @@
         window.CaseApi.getSurvey(recordId),
       ]);
     } catch (err) {
+      stopLoading();
       if (version === state.selectionVersion) {
         toast("Could not load case", "The case data could not be retrieved.");
       }
       return;
     }
+    stopLoading();
 
     // Guard against a slow response landing after a newer selection.
     if (version !== state.selectionVersion) return;
@@ -356,7 +531,7 @@
     renderContext(detail);
     const locked = comparison.text_match_percentage < comparison.threshold;
     lockEligibility(locked);
-    const suggestion = cashy.target || cashy.decision || {};
+    const suggestion = cashy.decision || {};
     if (!locked) {
       renderEligibility({
         target: suggestion.eligibility_target, status: suggestion.eligibility_status,
@@ -490,6 +665,10 @@
     });
 
     /* ---- Load cases, then the first one ---- */
+    // Hold the screen the markup already painted until there is a case to look
+    // at. Released in finally so a failed boot shows the empty-list state and
+    // the toast instead of leaving the operator on a spinner that never clears.
+    const releaseBoot = claimLoading(0);
     Promise.all([window.CaseApi.getCases(), window.CaseApi.getPending()])
       .then(([cases, pendingIds]) => {
         state.cases = cases;
@@ -506,7 +685,8 @@
       .catch(() => {
         renderCaseList([]);
         toast("Could not load cases", "The case list could not be retrieved.");
-      });
+      })
+      .finally(releaseBoot);
   }
 
   document.addEventListener("DOMContentLoaded", init);

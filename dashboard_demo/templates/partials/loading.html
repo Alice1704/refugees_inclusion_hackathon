@@ -1,0 +1,42 @@
+{# Full-screen loading state, shown while the backend loads the model's weights.
+
+   Visible in the markup on purpose: the app fetches its cases and its first
+   comparison from script, so anything rendered before that resolves is an empty
+   shell - the case list with nothing in it and "Loading case" in the header.
+   Painting that first and covering it a moment later is the flash this avoids.
+   dashboard.js hides the screen once the first case is actually on screen.
+
+   The per-case-switch wait is a different problem and is handled separately:
+   a comparison answered from warm weights returns in ~20ms and must not flash a
+   full-screen overlay, so those arm a timer instead. See SHOW_AFTER_MS in
+   dashboard.js.
+
+   The wording is static, so there is nothing for the script to update while a
+   live region is announcing. One short line on purpose: the operator is waiting
+   on a known step, not reading copy. role="status" makes the text announced when
+   it appears; the script marks the workspace aria-busy while the screen is up. #}
+<div id="loading-screen" class="loading-screen" role="status" aria-live="polite">
+  <div class="loading-card">
+    <h2 id="loading-title" class="font-heading text-base font-bold leading-subheading text-brand">
+      Loading judgement engine
+    </h2>
+
+    {# Indeterminate: the backend reports no byte-level progress, so the bar
+       says "working" and never invents a percentage. The text carries meaning,
+       so the bar itself is hidden from assistive technology. #}
+    <div class="loading-track" role="presentation">
+      <div class="loading-bar"></div>
+    </div>
+  </div>
+</div>
+
+{# Without script the page never loads its cases, so the loading screen would sit
+   there for good. Say so rather than spinning forever. #}
+<noscript>
+  <style>
+    .loading-screen { display: none; }
+  </style>
+  <p class="p-4 text-[13px] leading-body text-ink-medium">
+    This dashboard loads its cases with JavaScript. Please enable it to continue.
+  </p>
+</noscript>

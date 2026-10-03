@@ -1,71 +1,126 @@
 from dataclasses import dataclass
-from dataclasses import NewType
+from dataclasses import field
 from typing import Optional
 
 import marshmallow_dataclass
 import marshmallow.validate as mv
 
+MONTH = mv.Regexp(r"^\d{4}-\d{2}$")
+DEPENDENCY_CATEGORIES = ("low", "average", "complete", "high")
+VULNERABILITY_CATEGORIES=(
+    "Vulnerabilidad Baja",
+    "Vulnerabilidad Moderada",
+    "Vulnerabilidad Elevada",
+    "Vulnerabilidad Severa",
+)
+ELIGIBILITY_TARGETS = ("INCLUSION", "EXCLUSION" )
 
-MonthType = NewType("MonthType", str, mv.Regexp(r'^\d{4}-\d{2}$'))
+
+ELIGIBILITY_STATUSES = (
+    "Elegible" ,
+    "Elegible por Proceso Acelerado",
+    "Lista de Reserva",
+    "No Elegible" ,
+    "No Elegible por Intenciones",
+    "No Elegible por Duplicidad",
+)
+
+
+@ dataclass
+class Interview:
+    month: str = field(metadata={"validate": MONTH})
+    office: Optional[str] = None
+
+
 
 @dataclass
-class Properties:
-    month: MonthType # type: ignore
-    office: Optional[str]
-
-@dataclass
-class Household:
+class Household :
     size: int
-    dependency_category: str
-    female_headed: Optional[bool]
-    sole_carer: Optional[bool]
-    spanish_spoken: bool
-    adult_illiteracy: bool
-    pass
+    dependency_category: str = field(
+        metadata={"validate" :mv.OneOf( DEPENDENCY_CATEGORIES) }
+    )
+    female_headed :Optional[bool]=None
+    sole_carer:Optional[bool ]= None
+
+
+    spanish_spoken:bool=False
+    adult_illiteracy:bool =False
+
 
 @dataclass
 class Demographics:
-    head_of_household: float
-    language_barrier: float
-    specific_needs: float
-    documentation: float
-    score: float
-    pass
+    head_of_household:float =0.0
+    language_barrier: float = 0.0
+    specific_needs :float=0.0
+
+    documentation: float = 0.0
+    score : float =0.0
 
 
 @dataclass
-class Needs_and_coping:
-    basic_needs : float
-    housing : float
-    negative_coping : float
-    dependency : float
-    score : float
+class NeedsAndCoping:
+    basic_needs :float= 0.0
+    housing: float = 0.0
+    negative_coping: float = 0.0
+    dependency:float=0.0
+    score: float =0.0
+
+
 
 @dataclass
-class Scores:
-    final_score : float
-    vulnerability_index : float
-    vulnerability_category : str
+class Scores :
+    final_score:float
+    vulnerability_index: float
+    vulnerability_category : str = field (
+        metadata ={"validate" :mv.OneOf (VULNERABILITY_CATEGORIES )}
+    )
+
 
 @dataclass
-class Administrative_flags:
-    asylum_procedure : Optional[int]
-    intentions : int
-    duplicate : int
+class AdministrativeFlags:
+    asylum_procedure: Optional[int] = None
+    intentions : int = 0
+    duplicate: int = 0
+
 
 @dataclass
 class Decision:
-    eligibility_target: str
-    eligibility_status: str
+    eligibility_target: str = field(
+        metadata= {"validate":mv.OneOf ( ELIGIBILITY_TARGETS )}
+    )
+    eligibility_status : str=field (
+        metadata={"validate": mv.OneOf(ELIGIBILITY_STATUSES)}
+    )
 
 
-@dataclass
-class Scoreboard:
-    record_id: int
-    properties: Properties
-    household: Household
-    demographics: Demographics
-    needs_and_coping: Needs_and_coping
-    scores: Scores
-    administrative_flags: Administrative_flags
-    decision: Decision
+#typed view of assets/outputs/output-schema.json. the json file is the contract,
+# so unknown keys are an error rather than being dropped: a silently ignored
+#field is exactly the drift this layer is here to catch.
+@ dataclass
+class Output:
+    record_id:int
+    interview: Interview
+    household : Household
+    demographics : Demographics
+    needs_and_coping: NeedsAndCoping
+    scores:Scores
+    administrative_flags:AdministrativeFlags
+    decision : Decision
+
+    #required not defaulted, output-schema.json lists analysis in required and
+    #an empty default would quietly accept a record the schema rejects.
+    analysis:str
+
+
+#module level because class_schema walks the type tree and is not cheap
+ScoreboardSchema= marshmallow_dataclass.class_schema (Output) ( )
+
+
+# parses + validates one record, raises marshmallow.ValidationError
+def load( raw ):
+    return ScoreboardSchema.load (raw )
+
+
+#back to plain json data
+def dump( record):
+    return ScoreboardSchema.dump(record )
