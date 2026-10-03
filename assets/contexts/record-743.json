@@ -1,0 +1,16 @@
+{
+  "record_id": 743,
+  "month": "2023-07",
+  "office": "fupal",
+  "description": "17 places were available in the month and 2 had already been assigned, so places were still open when the case was processed. The origin country is not in an active conflict area, so the case was not treated as urgent. Security exposure was recorded as low and the household was at the settled stage of displacement. No sex or sexuality discrimination risk was recorded on the file. No activism exposure was recorded against the household. An interpreter was available and used, and the household presented without visible distress. The administrative flags are not part of this context: they belong to the scorecard, which is exactly why the model cannot weigh them. On this context the household reads as a stable, low-urgency case, and the budget is what actually decides it.",
+  "external_variables": {
+    "budget_places_available": 17,
+    "budget_places_assigned": 2,
+    "origin_country_conflict": false,
+    "security_exposure": "low",
+    "displacement_stage": "settled",
+    "sex_or_sexuality_discrimination": false,
+    "activism_exposure": false,
+    "interpretation_available": true
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "record_id": 1055,
+  "interview": {
+    "month": "2023-06",
+    "office": "pcr_cdmx"
+  },
+  "household": {
+    "size": 3,
+    "dependency_category": "average",
+    "female_headed": true,
+    "sole_carer": false,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 1.0,
+    "language_barrier": 1.0,
+    "specific_needs": 1.0,
+    "documentation": 1.0,
+    "score": 0.0
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.0,
+    "housing": 1.498900966,
+    "negative_coping": 1.0,
+    "dependency": 1.0,
+    "score": 3.815111519
+  },
+  "scores": {
+    "final_score": 3.692337415207061,
+    "vulnerability_index": 2.10647915,
+    "vulnerability_category": "Vulnerabilidad Baja"
+  },
+  "administrative_flags": {
+    "asylum_procedure": 0,
+    "intentions": -500,
+    "duplicate": 0
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "No Elegible por Intenciones"
+  },
+  "analysis": "The household has 3 members. Its vulnerability category is low, with a final score of 4. The household is female-headed. An intentions flag was raised on the form, so the household is excluded whatever its needs."
+}

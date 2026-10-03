@@ -1,0 +1,44 @@
+{
+  "record_id": 1114,
+  "interview": {
+    "month": "2024-05",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 5,
+    "dependency_category": "low",
+    "female_headed": true,
+    "sole_carer": false,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 2.700708215,
+    "language_barrier": 1.0,
+    "specific_needs": 1.0,
+    "documentation": 1.0,
+    "score": 9.472088355
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.776038647,
+    "housing": 2.823478261,
+    "negative_coping": 1.790108696,
+    "dependency": 1.0,
+    "score": 26.18890898
+  },
+  "scores": {
+    "final_score": 35.123033330466875,
+    "vulnerability_index": 3.012873318,
+    "vulnerability_category": "Vulnerabilidad Elevada"
+  },
+  "administrative_flags": {
+    "asylum_procedure": null,
+    "intentions": 0,
+    "duplicate": 0
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "No Elegible"
+  },
+  "analysis": "The household has 5 members. Its vulnerability category is high, with a final score of 35. The household is female-headed. The household does not meet the criteria and should be excluded."
+}

@@ -1,0 +1,44 @@
+{
+  "record_id": 743,
+  "interview": {
+    "month": "2023-07",
+    "office": "fupal"
+  },
+  "household": {
+    "size": 3,
+    "dependency_category": "complete",
+    "female_headed": true,
+    "sole_carer": true,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 2.700708215,
+    "language_barrier": 1.0,
+    "specific_needs": 1.249197356,
+    "documentation": 1.0,
+    "score": 11.93561888
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.776038647,
+    "housing": 2.823478261,
+    "negative_coping": 2.580217391,
+    "dependency": 1.0,
+    "score": 32.12448674
+  },
+  "scores": {
+    "final_score": 43.41040766339734,
+    "vulnerability_index": 3.251863502,
+    "vulnerability_category": "Vulnerabilidad Elevada"
+  },
+  "administrative_flags": {
+    "asylum_procedure": null,
+    "intentions": 0,
+    "duplicate": 0
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "No Elegible"
+  },
+  "analysis": "It is a household of 3 people. The vulnerability assessment comes out high and the final score is 43. One adult carries all the caring responsibilities. A woman heads the household. Taken together, this does not support including the household."
+}

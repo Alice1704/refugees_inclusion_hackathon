@@ -1,0 +1,44 @@
+{
+  "record_id": 114,
+  "interview": {
+    "month": "2024-05",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 2,
+    "dependency_category": "average",
+    "female_headed": true,
+    "sole_carer": true,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 1.0,
+    "language_barrier": 1.0,
+    "specific_needs": 1.0,
+    "documentation": 1.0,
+    "score": 0.0
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.776038647,
+    "housing": 1.498900966,
+    "negative_coping": 1.790108696,
+    "dependency": 1.0,
+    "score": 17.10850297
+  },
+  "scores": {
+    "final_score": 16.55793423592243,
+    "vulnerability_index": 2.477495573,
+    "vulnerability_category": "Vulnerabilidad Baja"
+  },
+  "administrative_flags": {
+    "asylum_procedure": -500,
+    "intentions": 0,
+    "duplicate": 0
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "No Elegible"
+  },
+  "analysis": "The household has 2 members. Its vulnerability category is low, with a final score of 17. A sole carer looks after the household. The household is female-headed. The household does not meet the criteria and should be excluded."
+}

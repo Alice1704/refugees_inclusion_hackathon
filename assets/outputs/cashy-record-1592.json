@@ -1,0 +1,44 @@
+{
+  "record_id": 1592,
+  "interview": {
+    "month": "2024-02",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 1,
+    "dependency_category": "low",
+    "female_headed": null,
+    "sole_carer": null,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 1.0,
+    "language_barrier": 1.0,
+    "specific_needs": 1.0,
+    "documentation": 1.0,
+    "score": 0.0
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.0,
+    "housing": 1.0,
+    "negative_coping": 1.0,
+    "dependency": 1.0,
+    "score": 0.0
+  },
+  "scores": {
+    "final_score": 0.0,
+    "vulnerability_index": 2.0,
+    "vulnerability_category": "Vulnerabilidad Baja"
+  },
+  "administrative_flags": {
+    "asylum_procedure": 0,
+    "intentions": 0,
+    "duplicate": 0
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "Lista de Reserva"
+  },
+  "analysis": "It is a household of 1 person. The vulnerability assessment comes out low and the final score is 0. The dependency level in the household is low. The pressure from needs and coping is light. The household qualifies in principle, but I would hold it on the waiting list until a place opens."
+}

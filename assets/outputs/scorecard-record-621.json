@@ -1,0 +1,44 @@
+{
+  "record_id": 621,
+  "interview": {
+    "month": "2023-10",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 2,
+    "dependency_category": "average",
+    "female_headed": true,
+    "sole_carer": true,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 1.0,
+    "language_barrier": 1.0,
+    "specific_needs": 1.0,
+    "documentation": 1.0,
+    "score": 0.0
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.776038647,
+    "housing": 2.117608696,
+    "negative_coping": 2.580217391,
+    "dependency": 1.738466184,
+    "score": 36.78475459
+  },
+  "scores": {
+    "final_score": 35.60098440253921,
+    "vulnerability_index": 3.0266566,
+    "vulnerability_category": "Vulnerabilidad Elevada"
+  },
+  "administrative_flags": {
+    "asylum_procedure": 0,
+    "intentions": -500,
+    "duplicate": 0
+  },
+  "decision": {
+    "eligibility_target": "EXCLUSION",
+    "eligibility_status": "No Elegible por Intenciones"
+  },
+  "analysis": "The household has 2 members. Its vulnerability category is high, with a final score of 36. A sole carer looks after the household. The household is female-headed. An intentions flag was raised on the form, so the household is excluded whatever its needs."
+}

@@ -1,0 +1,44 @@
+{
+  "record_id": 1206,
+  "interview": {
+    "month": "2024-05",
+    "office": "sotap"
+  },
+  "household": {
+    "size": 3,
+    "dependency_category": "average",
+    "female_headed": false,
+    "sole_carer": false,
+    "spanish_spoken": true,
+    "adult_illiteracy": false
+  },
+  "demographics": {
+    "head_of_household": 2.700708215,
+    "language_barrier": 1.0,
+    "specific_needs": 3.251728045,
+    "documentation": 1.0,
+    "score": 24.2379543
+  },
+  "needs_and_coping": {
+    "basic_needs": 1.0,
+    "housing": 1.498900966,
+    "negative_coping": 1.790108696,
+    "dependency": 1.043888889,
+    "score": 10.52243148
+  },
+  "scores": {
+    "final_score": 35.20176501987042,
+    "vulnerability_index": 3.015143476,
+    "vulnerability_category": "Vulnerabilidad Elevada"
+  },
+  "administrative_flags": {
+    "asylum_procedure": null,
+    "intentions": -500,
+    "duplicate": -500
+  },
+  "decision": {
+    "eligibility_target": "INCLUSION",
+    "eligibility_status": "Elegible"
+  },
+  "analysis": "The pressure from needs and coping is light. The dependency level in the household is average. Housing is not a pressing problem. On need alone I would recommend including the household."
+}

@@ -1,0 +1,16 @@
+{
+  "record_id": 1206,
+  "month": "2024-05",
+  "office": "sotap",
+  "description": "18 places were available in the month and 16 had already been assigned, so places were still open when the case was processed. The origin country is not in an active conflict area, so the case was not treated as urgent. Security exposure was recorded as medium and the household was at the settled stage of displacement. A risk of sex or sexuality discrimination was recorded on the file. The household is known for activism, which the month treated as a risk. An interpreter was available and used, and the household presented without visible distress. The administrative flags are not part of this context: they belong to the scorecard, which is exactly why the model cannot weigh them. On this context the household reads as a stable, low-urgency case, and the budget is what actually decides it.",
+  "external_variables": {
+    "budget_places_available": 18,
+    "budget_places_assigned": 16,
+    "origin_country_conflict": false,
+    "security_exposure": "medium",
+    "displacement_stage": "settled",
+    "sex_or_sexuality_discrimination": true,
+    "activism_exposure": true,
+    "interpretation_available": true
+  }
+}
