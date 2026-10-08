@@ -103,7 +103,7 @@ Completing the survey is **mandatory before the judgement becomes final** and ca
 
 ## Dashboard
 
-![dashboard_demo_loading.png](assets/images/dashboard_demo_loading.png)
+![dashboard_demo.gif](assets/images/dashboard_demo.gif)
 
 The interface employs a three-pane design focused on transparency, bias awareness, and cognitive forcing:
 
