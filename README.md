@@ -1,230 +1,153 @@
-# refugees_inclusion_hackathon
+# Data & Innovation for Refugee Inclusion Hackathon
 
-Repository for the 2026 Data &amp; Innovation for refugees and Inclusion hackathon promoted by UNHCR and UniTrento.
+Repository for the **"2026 Data & Innovation for Refugees and Inclusion"** hackathon promoted by [UNHCR](https://www.unhcr.org/) and the [University of Trento](https://www.unitn.it/).
 
-Our project addresses the core challenge of the hackathon:
-
-> How do we make sure caseworkers keep overriding the AI when its advice is wrong, and that the institution can see when they stop?
-
-The project explores how to preserve meaningful human oversight in AI-assisted cash-targeting decisions by combining cognitive forcing, attention checks, structured operator feedback, and institutional monitoring.
+This project explores how to preserve meaningful human oversight in AI-assisted cash-targeting decisions by combining a **Judgement Engine** with a **Cognitive-Forcing Interface**.
 
 ## Problem
 
 Cashy is an AI decision-support prototype for humanitarian cash targeting. It provides a predicted score, vulnerability category, inclusion/exclusion recommendation, and a written explanation based on household data.
 
-The final decision, however, remains the responsibility of a human caseworker.
+The final decision, however, remains the sole responsibility of a human caseworker.
 
-This creates a specific risk: **over-reliance on AI**.
+This creates a specific risk: **automation bias and over-reliance on AI**. Research shows that operator trust in AI is inherently volatile: caseworkers exhibit _algorithm appreciation_ by preferring AI predictions initially, yet quickly switch to _algorithm aversion_ after observing a single error. Furthermore, displaying AI explanations can inflate trust regardless of accuracy, leading operators to passively accept incorrect advice.
 
-The goal is therefore not simply to maximize agreement with the AI, but to support appropriate reliance:
+The goal is therefore not simply to maximize agreement with the AI, but to support **appropriate reliance**:
 
-- Correct override: Cashy is wrong and the caseworker overrides it
-- Over-reliance: Cashy is wrong and the caseworker accepts it
-- Correct acceptance: Cashy is correct and the caseworker accepts it
-- Under-reliance: Cashy is correct and the caseworker overrides it
+- **Correct override**: Cashy is wrong and the caseworker overrides it;
+- **Over-reliance**: Cashy is wrong and the caseworker accepts it;
+- **Correct acceptance**: Cashy is correct and the caseworker accepts it;
+- **Under-reliance**: Cashy is correct and the caseworker overrides it.
 
-Importantly, throughout this project, "correct" means agreement with the operation's recorded determination. This is the institutional reference standard for the exercise, not ground truth about a household's needs.
+> **Institutional Reference Standard**: Throughout this project, "correct" means agreement with the operation's recorded determination. This is the institutional reference standard for the exercise, not ground truth about a household's needs.
 
 ## Our approach
 
-Our solution introduces an Oversight Layer between Cashy's recommendation and the final human decision.
+Our solution introduces an **Oversight Layer** between Cashy's recommendation and the final human decision. Instead of retraining the underlying prediction model, the system prioritizes caseworker engagement through cognitive forcing mechanisms.
 
 The interface actively measures whether the caseworker:
 
-- inspected the case
-- considered Cashy's reasoning
-- considered Cashy's recommendation separately
-- recognized potential discrepancies
-- made an independent judgement
-- and provided a reason for that judgement
+- Inspected the case context;
+- Considered Cashy's reasoning;
+- Considered Cashy's recommendation separately;
+- Recognized potential discrepancies;
+- Made an independent judgement;
+- Provided a reason for that judgement.
 
-The system also monitors aggregated behaviour over time so that a loss of human oversight becomes visible to the institution.
+The system also monitors aggregated behavior over time so that a loss of human oversight becomes visible to the institution before becoming systemic.
 
 ## Workflow pipeline
 
 ```txt
-      START                                                       
-        │                                                         
-  ┌─────▼─────┐                  ┌───────┐                        
-  │ Interview ├──Data+opinion────► Cashy ├──┐                     
-  └─────┬─────┘                  └───────┘  │                     
-        │                                 Score+motivation        
-        │                                   │                     
-        │                              ┌────▼──────┐              
-        └───────────Scorecard──────────► Judgement │              
-                                       │  Process  │              
-                                       └────┬───▲──┘              
-                                            │   │                 
-                                       ┌────▼───┴─┐               
-                                       │ Operator │               
-                                       │  Survey  │               
-                                       └────┬─────┘               
-                                            │                     
-                                           END                    
+                 START
+                   │
+                   ▼
+             ┌───────────┐  data + context  ┌───────────┐
+             │ Interview ├─────────────────►│   Cashy   │
+             └─────┬─────┘                  └─────┬─────┘
+                   │                              │
+            standard output                  cashy output
+                   │                              │
+                   └──────────────┐┌──────────────┘
+                                  ▼▼
+                          ┌───────────────┐
+                          │   Judgement   │
+                          │    Process    │
+                          └─────▲───┬─────┘
+                                │   │
+                                │   ▼
+                          ┌─────┴───┬─────┐
+                          │   Operator    │
+                          │    Survey     │
+                          └───────┬───────┘
+                                  │
+                                  ▼
+                                 STOP  
+
 ```
+
+1. **Interview**: Registration staff interview the household regarding identity, vulnerability, health, housing, and basic needs, recording interviewer observations;
+2. **Scorecard**: Rule-based logic processes interview data to generate scores, vulnerability tiers, and administrative checks;
+3. **Cashy Recommendation**: The AI model predicts scores and eligibility recommendations alongside a natural-language rationale;
+4. **Judgement Engine**: Background Python services compare Scorecard inputs against Cashy's predictions to assess agreement and flag divergence risks;
+5. **Operator Survey & Decision**: The operator completes a mandatory survey before submitting an independent determination.
 
 ## Decision process architecture
 
-The judgement process is designed around a key principle from the challenge brief: Cashy's reasoning and its final answer must be treated as separate outputs.
-A single "I agree" interaction is not sufficient evidence that the operator actually evaluated the recommendation.
+The judgement process is designed around a key principle from the challenge brief: **Cashy's reasoning and its final answer must be treated as separate outputs**. A single "I agree" interaction is not sufficient evidence that the operator actually evaluated the recommendation.
+
+### Judgement Engine & Discrepancy Detection
+
+The **Judgement Engine** computes semantic and contextual consistency between Scorecard indicators and Cashy's predictions. When semantic match scores fall below configured thresholds (e.g., threshold value of 75), the system flags the case with `show_warning: true` to trigger active interface interventions.
 
 ### Attention and cognitive forcing
 
-The interface can adapt its behaviour when there are signals that the operator may be accepting Cashy's recommendation without sufficient analysis.
+The interface adapts its behavior when signals suggest the operator may be accepting Cashy's recommendation without sufficient analysis:
 
-Potential interventions include:
-
-- Warning messages when Cashy's output conflicts with the available scorecard information.
-- Forced reflection prompts before accepting a recommendation.
-- Separate confirmation of Cashy's reasoning and final recommendation.
-- Attention checks triggered by suspiciously fast or repetitive interactions.
-- Context-sensitive thresholds based on known classes of cases where Cashy's recommendations are more or less reliable.
-- Additional questions when the operator appears inactive or repeatedly performs the same action without inspecting the case.
-
-The objective is to make sure that the eventual agreement is an informed decision rather than an automatic one.
+- **Critical Case Warning Modals**: Triggered when Cashy's output conflicts with Scorecard data or exhibits low semantic agreement, forcing the caseworker to acknowledge potential AI error;
+- **Forced Reflection Prompts**: Interactive confirmations required before submitting decisions on high-risk cases;
+- **Separate Output Rating**: Independent evaluation controls for Cashy's reasoning versus its final recommendation;
+- **Attention Checks**: Detection mechanisms triggered by suspiciously fast click rates or repetitive unread interactions;
+- **Context-Sensitive Thresholds**: Dynamic risk triggers based on historical classes of cases where model reliability varies.
 
 ### Operator survey architecture
 
-The survey is part of the decision process rather than a post-hoc satisfaction questionnaire.
+The survey is part of the core decision process rather than a post-hoc questionnaire. Feedback is collected for both accepted and overridden recommendations, turning feedback into a cognitive forcing mechanism.
 
-Feedback is collected for both correct and incorrect Cashy recommendations, so that completing the survey requires the operator to actively analyse the outcome rather than only explain an override.
+Completing the survey is **mandatory before the judgement becomes final** and captures:
 
-The survey captures:
+- **Perceived Effectiveness**: A 1-to-5 scale rating Cashy's utility in identifying appropriate candidates;
+- **Explicit Agreement**: Binary concurrence indicator (`Yes` / `No`);
+- **Qualitative Rationale**: Mandatory free-text input (up to 500 characters) documenting key decision drivers;
+- **Explanatory Relevance**: Tri-state rating (`Yes` / `No` / `Not sure`) evaluating whether Cashy's rationale provided meaningful context;
 
-- whether the operator agrees with Cashy's recommendation
-- whether they intend to override it
-- why they disagree
-- perceived correctness of the recommendation
-- relevance of Cashy's reasoning
-- appropriateness of the recommendation to the case
-- and, where appropriate, the reason for the final decision
+## Dashboard
 
-The survey is mandatory before the judgement becomes final.
+![dashboard_demo_loading.png](assets/images/dashboard_demo_loading.png)
 
-This extends the original feedback mechanism by requiring operators to reflect on the case even when they agree with Cashy.
+The interface employs a three-pane design focused on transparency, bias awareness, and cognitive forcing:
 
-The goal is to turn feedback into a cognitive forcing mechanism rather than simply collecting opinions.
+- **Left Sidebar**: Case list queue with status indicators (`Pending`, `Awaiting survey`);
+- **Center Pane**: External variables accordion (household metrics, security exposure) and primary decision buttons (`Approve inclusion`, `Exclude`);
+- **Right Pane**: Cashy's natural-language rationale and contextual explanations.
 
-## Metrics
+### Screenshots
 
-The prototype records the information required to distinguish different forms of reliance.
-
-### Decision-level metrics
-
-|Metric|Definition|
+| | |
 |--|--|
-|Correct override|Cashy is wrong and the operator overrides it|
-|Over-reliance|Cashy is wrong and the operator accepts it|
-|Correct acceptance|Cashy is correct and the operator accepts it|
-|Under-reliance|Cashy is correct and the operator overrides it|
-|End-to-end accuracy|Final operator decision agrees with the reference determination|
-|Review time|Time spent reviewing the case|
-|Reasoning/recommendation gap|Difference between ratings of Cashy's reasoning and recommendation|
+| ![dashboard_demo_loading.png](assets/images/dashboard_demo_loading.png) | ![dashboard_demo_case_view.png](assets/images/dashboard_demo_case_view.png) |
+| ![dashboard_demo_dialog.png](assets/images/dashboard_demo_dialog.png) | ![dashboard_demo_survey.png](assets/images/dashboard_demo_survey.png) |
 
-The reasoning/recommendation distinction is particularly important because a caseworker may find an explanation convincing even when the underlying recommendation is not supported by the case.
+> [!NOTE]
+> Information about dashboard's development and deplyment can be found inside [`dashboard_demo/README.md`](dashboard_demo/README.md) file.
 
-### Institutional metrics
+## Dataset Analysis & Limitations
 
-The monitoring layer can aggregate these measurements by:
-
-- time period
-- case type
-- vulnerability category
-- direction of Cashy's error
-- office or operational unit, where appropriate and sufficiently anonymized
-- intervention type
-
-The system should report trends rather than turn individual operators into performance scores.
-
-## Implementation principles
-
-The solution follows five principles from the challenge:
-
-1. **Human judgement must remain meaningful**:
-the operator is not an approval button, he's the final decision-maker.
-
-2. **Reasoning and recommendation stay separate**:
-Cashy's explanation and its recommendation are evaluated independently.
-
-3. **Reliance must be measured behaviourally**:
-we measure correct override, over-reliance, correct acceptance and under-reliance rather than simply measuring agreement with AI.
-
-4. **Oversight must be visible at the institutional level**:
-a loss of appropriate reliance should become observable before it becomes a systemic problem.
-
-5. **Monitoring must not become another source of pressure**:
-the goal is not to maximize overrides, it's to maintain appropriate reliance on AI.
-
-## Data and ethics
-
-This project uses synthetic data only.
-
-The challenge provides a synthetic sample derived from historical Scorecard records. It does not represent real households.
-We therefore:
-
-- do not use real household data
-- do not attempt to identify caseworkers
-- do not reconstruct withheld free-text information
-- do not treat the synthetic sample as representative of the real operational population
-- do not use override behaviour as an individual performance score
-- keep the human responsible for the final decision
-- and distinguish the institutional reference determination from "truth" about a household
-
-### Important limitation
-
-The synthetic dataset should not be used to benchmark Cashy's real-world eligibility performance. The challenge documentation explicitly warns that eligibility in the synthetic sample is almost unrelated to the final score and that results from it should be presented as properties of the synthetic sample.
+Exploratory analysis of the synthetic dataset (`S8.synthetic_cashy_sample.csv`) demonstrated that eligibility outcomes are not strongly predicted by Scorecard factors alone. `FinalScore` distributions for included vs. excluded cases overlap significantly across deciles, yielding an Area Under the Curve (AUC) of 0.529.
 
 ## Feasibility of implementation
 
-The solution does not require replacing/retraining Cashy or introducing a new AI system. Instead, it adds an instrumentation and monitoring layer around the existing decision process.
-
-### Deployment and maintainability
-
-A staged implementation would reduce deployment risk:
-
-1. Prototype: validate the interaction design using synthetic cases
-2. Override audit: test the workflow on already-decided cases before it is used in consequential decisions
-3. Pilot: deploy the instrumentation to a limited operational setting with appropriate governance and monitoring
-4. Production monitoring: integrate the structured event data with the existing reporting pipeline
-5. Continuous evaluation: periodically audit whether interventions change behaviour and whether monitoring signals remain informative
-
-### Cost and scalability
-
-The approach is designed to minimize infrastructure and maintenance costs because it reuses existing components rather than requiring a new model-serving or analytics platform. The principal implementation cost is therefore in interface integration, structured event logging, dashboard configuration and evaluation. The output formatted as a JSON is easily importable into Power BI for 
-
-The same architecture can also be reused across different targeting workflows. The intervention rules, survey questions and metrics can be configured independently of the underlying prediction model, allowing the oversight layer to remain useful even if Cashy's model is changed or replaced.
-
-## Prototype
-
-The prototype demonstrates three representative cases:
-
-1. Simple case: Cashy and the reference Scorecard agree.
-2. Difficult case: Cashy's recommendation conflicts with important information in the case.
-3. Complex / edge case: a deliberately challenging case designed to test whether the operator notices a less obvious discrepancy.
-
-For each case, the demo shows:
-
-- Cashy's reasoning
-- Cashy's recommendation
-- warning and cognitive-forcing mechanisms
-- attention-detection behaviour
-- the comparison judgement
-- the mandatory survey
+The solution requires zero retraining or replacement of existing predictive models, operating purely as an instrumentation and oversight layer.
 
 ## Acknowledgements
 
-This project was developed for the 2026 Data & Innovation for Refugee Inclusion Hackathon, organized by UNHCR Innovation and the University of Trento.
+This project was developed by **Team Rocket**, for the **2026 Data & Innovation for Refugee Inclusion Hackathon**, organized by **UNHCR Innovation** and the **University of Trento**.
 
-We thank the challenge organizers and contributors for providing the synthetic dataset, challenge materials, research findings and experimental framework that made this prototype possible.
+We thank the challenge organizers and contributors for providing the synthetic dataset, challenge materials, research findings, and experimental framework.
 
-Additional tools and resources:
+### Tools & Resources
 
-- [ASCIIFlow](https://asciiflow.com) - used for creating and refining architecture diagrams.
+- **[Python](https://www.python.org/) & [Flask](https://flask.palletsprojects.com/)**: Used to build the backend REST API and decision logic;
+- **[Jupyter Notebook](https://jupyter.org/)**: Used for data analysis and for prototyping the Judgement Engine logic;
+- **[Tailwind CSS](https://tailwindcss.com/)**: Used for styling the interactive dashboard UI;
+- **[ASCIIFlow](https://asciiflow.com/)**: Used for creating and refining the workflow architecture diagrams.
 
 ## References
 
-- [UNHCR Innovation — Cashy Oversight Challenge and hackathon materials.](https://maldonam.github.io/public/)
-- O'Brien, H.L. and Toms, E.G. (2008). What is user engagement? A conceptual framework for defining user engagement with technology. J. Am. Soc. Inf. Sci., 59: 938-955. [https://doi.org/10.1002/asi.20801](https://doi.org/10.1002/asi.20801)
-- Dietvorst, Simmons & Massey (2015). Algorithm aversion: People Erroneously Avoid Algorithms after Seeing Them Err
-- Yu, L., Li, Y., & Fan, F. (2023). Employees' Appraisals and Trust of Artificial Intelligences' Transparency and Opacity. _Behavioral sciences (Basel, Switzerland)_, _13_(4), 344. https://doi.org/10.3390/bs13040344
-- Logg, J. M., Minson, J. A., & Moore, D. A. (2019). Algorithm appreciation: People prefer algorithmic to human judgment. _Organizational Behavior and Human Decision Processes_, _151_, 90–103. [https://doi.org/10.1016/j.obhdp.2018.12.005](https://doi.org/10.1016/j.obhdp.2018.12.005)
+- Bucinca, Z., Malaya, M. B., & Gajos, K. Z. (2021). To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on AI in AI-Assisted Decision Making. _Proc. ACM Hum.-Comput. Interact._, 5(CSCW1), 1–21.
+- Dietvorst, B. J., Simmons, J. P., & Massey, C. (2015). Algorithm aversion: People erroneously avoid algorithms after seeing them err. _Journal of Experimental Psychology: General_, 144(1), 114–126.
+- Logg, J. M., Minson, J. A., & Moore, D. A. (2019). Algorithm appreciation: People prefer algorithmic to human judgment. _Organizational Behavior and Human Decision Processes_, 151, 90–103.
+- O'Brien, H. L., & Toms, E. G. (2008). What is user engagement? A conceptual framework for defining user engagement with technology. _J. Am. Soc. Inf. Sci._, 59(6), 938–955.
+- Parasuraman, R., & Manzey, D. H. (2010). Complacency and bias in human use of automation: An attentional integration. _Human Factors_, 52(3), 381–410.
+- UNHCR Innovation. _Cashy Oversight Challenge and hackathon materials_.
+- Yu, L., Li, Y., & Fan, F. (2023). Employees' appraisals and trust of artificial intelligences' transparency and opacity. _Behavioral Sciences_, 13(4), 344.
